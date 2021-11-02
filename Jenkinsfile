@@ -16,10 +16,13 @@ pipeline {
     }
 
     stage("deploy") {
-      if(env.BRANCH_NAME == 'master') {
-        steps {
-          echo "deploying application"
+      when {
+        expression {
+          env.BRANCH_NAME == 'master'
         }
+      }
+      steps {
+        echo "deploying application"
       }
     }
 
