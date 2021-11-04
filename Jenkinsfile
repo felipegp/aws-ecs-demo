@@ -8,6 +8,7 @@ pipeline {
     stage("build") {
       steps {
         echo "building application"
+        sh '(cd docker-app/app; npm install)'
       }
     }
     
