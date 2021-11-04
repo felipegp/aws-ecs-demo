@@ -5,9 +5,9 @@ pipeline {
   
   stages {
     
-    stage("build") {
+    stage("install packages") {
       steps {
-        echo "building application"
+        echo "installing packages"
         sh '(cd docker-app/app; npm install)'
       }
     }
@@ -19,16 +19,17 @@ pipeline {
       }
     }
 
-    stage("deploy") {
-      when {
-        expression {
-          env.BRANCH_NAME == 'master'
-        }
+    stage("build image") {
+      steps {
+        echo "building image"
+        sh '(cd docker-app; docker build -t 599895438818.dkr.ecr.sa-east-1.amazonaws.com/my-app:1.0 .)'
       }
+    }
+
+    stage("deploy") {
       steps {
         echo "deploying application"
       }
     }
-
   }
 }
