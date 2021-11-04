@@ -8,13 +8,13 @@ pipeline {
     stage("build") {
       steps {
         echo "building application"
-        sh 'node --version'
       }
     }
     
     stage("unit test") {
       steps {
         echo "testing application"
+        sh '(cd docker-app/app; npm run test)'
       }
     }
 
