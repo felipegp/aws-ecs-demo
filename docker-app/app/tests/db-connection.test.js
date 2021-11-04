@@ -8,10 +8,10 @@ describe('db connection unit tests', () => {
     expect(result).toBeDefined();
   });
 
-  test('broken unit test', () => {
+  test('fixed unit test', () => {
     const result = 5;
   
-    expect(result).toBeNull();
+    expect(result).toBe(5);
   });
 });
 
