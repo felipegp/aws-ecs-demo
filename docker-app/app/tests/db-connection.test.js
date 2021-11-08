@@ -9,7 +9,7 @@ describe('db connection unit tests', () => {
   });
 
   test('broken unit test', () => {
-    const result = 4;
+    const result = 5;
   
     expect(result).toBe(5);
   });

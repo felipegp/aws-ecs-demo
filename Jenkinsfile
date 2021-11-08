@@ -26,7 +26,7 @@ node {
   stage('Push image') {
     docker.withRegistry(
       'https://599895438818.dkr.ecr.sa-east-1.amazonaws.com', 
-      'ecr:sa-east-1:AKIAYXLEN6XRBKEGLWN7') {
+      'ecr:sa-east-1:aws-ecr-credentials') {
       myImage.push("latest")        
     }    
   }
