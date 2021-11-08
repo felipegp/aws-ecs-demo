@@ -1,12 +1,14 @@
 node {
-  def myImage     
+  def myImage
+  def awsDomain = "599895438818.dkr.ecr.sa-east-1.amazonaws.com"
+  def myImageName = "${awsDomain}/my-app:${env.BUILD_ID}"
 
   stage('Clone repository') {
     checkout scm    
   }     
 
   stage('Build image') {
-    myImage = docker.build("599895438818.dkr.ecr.sa-east-1.amazonaws.com/my-app:${env.BUILD_ID}", "./docker-app")
+    myImage = docker.build(myImageName, "./docker-app")
   }
 
   stage('Install packages') {
@@ -25,14 +27,17 @@ node {
 
   stage('Push image') {
     docker.withRegistry(
-      'https://599895438818.dkr.ecr.sa-east-1.amazonaws.com', 
+      'https://' + awsDomain, 
       'ecr:sa-east-1:aws-ecr-credentials') {
       myImage.push("latest")        
     }    
   }
 
   stage('Cleaning up') {
-    sh 'echo "cleaning up unused images"'
+    sh 'echo "removing image"'
+    sh """
+    docker rmi """ + myImageName + """
+    """
   }
 
 }
