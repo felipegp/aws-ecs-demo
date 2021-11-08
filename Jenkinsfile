@@ -1,35 +1,38 @@
-pipeline {
-  agent {
-    docker { image 'node:14-alpine' }
-  }
-  
-  stages {
-    
-    stage("install packages") {
-      steps {
-        echo "installing packages"
-        sh '(cd docker-app/app; npm install)'
-      }
-    }
-    
-    stage("unit test") {
-      steps {
-        echo "testing application"
-        sh '(cd docker-app/app; npm run test)'
-      }
-    }
+node {
+  def myImage     
 
-    stage("build image") {
-      steps {
-        echo "building image"
-        sh '(cd docker-app; docker build -t 599895438818.dkr.ecr.sa-east-1.amazonaws.com/my-app:1.0 .)'
-      }
-    }
+  stage('Clone repository') {
+    checkout scm    
+  }     
 
-    stage("deploy") {
-      steps {
-        echo "deploying application"
-      }
-    }
+  stage('Build image') {
+    myImage = docker.build("599895438818.dkr.ecr.sa-east-1.amazonaws.com/my-app:${env.BUILD_ID}", "./docker-app")
   }
+
+  stage('Install packages') {
+    myImage.inside {
+      sh 'echo "installing packages"'
+      sh '(cd docker-app/app; npm install)'
+    }    
+  }
+
+  stage('Unit tests') {
+    myImage.inside {
+      sh 'echo "testing app"'
+      sh '(cd docker-app/app; npm run test)'
+    }    
+  }
+
+  stage('Push image') {
+    docker.withRegistry(
+      'https://599895438818.dkr.ecr.sa-east-1.amazonaws.com', 
+      'ecr:sa-east-1:AKIAYXLEN6XRBKEGLWN7') {
+      myImage.push("latest")        
+    }    
+  }
+
+  stage('Cleaning up') {
+    sh 'echo "cleaning up unused images"'
+  }
+
 }
