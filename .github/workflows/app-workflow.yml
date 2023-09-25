@@ -49,10 +49,29 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: sa-east-1
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
     - uses: actions/download-artifact@master
       with:
         name: jar-file
         path: app.jar
 
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag demo:$(date +%s)
+    - name: Build, tag, and push image to Amazon ECR
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: my-app
+        IMAGE_TAG: demo_image
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG . --file Dockerfile
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+#      run: docker build . --file Dockerfile --tag demo:$(date +%s)
