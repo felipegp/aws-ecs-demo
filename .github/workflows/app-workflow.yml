@@ -35,10 +35,10 @@ jobs:
         cache: maven
 
     - name: Install Maven dependencies
-      run: mvn install
+      run: mvn install --file app/pom.xml
 
     - name: Run tests
-      run: mvn verify
+      run: mvn verify --file app/pom.xml
 
 #    - name: Build with Maven
 #      run: mvn -B package --file app/pom.xml
